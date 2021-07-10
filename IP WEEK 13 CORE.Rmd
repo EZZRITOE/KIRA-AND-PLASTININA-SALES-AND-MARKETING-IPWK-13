@@ -1,0 +1,262 @@
+---
+title: "IP WEEK 13"
+author: "EZRA MAGETO"
+date: "7/10/2021"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+
+```
+
+
+
+
+
+
+
+```{r}
+ecom<-read.csv("http://bit.ly/EcommerceCustomersDataset")
+```
+
+
+
+```{r}
+##Previewing the top of the dataset
+head(ecom)
+```
+
+
+```{r}
+##Previewing the bottom of the data
+
+tail(ecom)
+```
+
+
+```{r}
+#EXPLORING THE DATASET
+##Viewing the dataset
+View(ecom)
+```
+
+
+```{r}
+##Checking the shape of the dataset
+dim(ecom)
+```
+
+the dataset has 12330 rows and 18 columns 
+
+```{r}
+##Checking structure of the dataset
+
+str(ecom)
+```
+
+
+```{r}
+##checking the column names of the dataset
+
+colnames(ecom)
+```
+
+
+```{r}
+##Checking the datatypes of the dataset
+class(ecom)
+sapply(ecom,class)
+```
+
+
+
+```{r}
+##Important features
+ecomm<-subset(ecom,select = c("ProductRelated", "ProductRelated_Duration", "PageValues", "Month", "VisitorType", "Weekend"))
+colnames(ecomm)
+```
+
+
+```{r}
+#DATA CLEANING 
+##Checking for missing values
+
+sum(is.na(ecomm))
+```
+
+
+
+```{r}
+##Dealing with missing values
+ecomm<-na.omit(ecomm)
+sum(is.na(ecomm))
+```
+
+
+
+```{r}
+##Checking for duplicates
+sum(duplicated(ecomm))
+```
+
+
+
+```{r}
+##Dealing with duplicates
+
+unique(ecomm)
+
+```
+
+
+
+```{r}
+##Checking for outliers
+product_related<-ecomm$ProductRelated
+product_related_duration<-ecomm$ProductRelated_Duration
+page_values<-ecomm$PageValues
+boxplot(product_related,product_related_duration,page_values)
+```
+
+the dataset contains some outliers in the Product Related Duration
+feature 
+
+```{r}
+#EXPLORATORY DATA ANALYSIS
+##Univariate Analysis
+####Summary of the descriptive statistics
+summary(ecom)
+```
+
+From the descriptive statistics weekdays had the most numbers visiting
+the site Many people who visited the site did not generate any revenue
+for the brand. Only 1908 out of 12330 contributed to revenue addition
+for the brand. \#\#Barplot
+
+```{r}
+ProductRelated <- ecomm$ProductRelated
+ProductRelated_frequency <- table(ProductRelated)
+barplot(ProductRelated_frequency)
+```
+
+there is a positive skew in the distribution \#\#Histogram
+
+```{r}
+hist(ecomm$ProductRelated)
+```
+
+
+```{r}
+###Product related duration histogram
+hist(ecomm$ProductRelated_Duration)
+```
+
+
+
+```{r}
+###Page values histogram
+hist(ecomm$PageValues)
+```
+
+
+```{r}
+#Bivariate Analysis 
+##getting the covariance
+page_values<-ecomm$PageValues
+product_related<-ecomm$ProductRelated
+#product_related_duration<-ecomm$ProductRelated_Duration
+cov(page_values,product_related)
+```
+
+
+
+```{r}
+##correlation
+page_values<-ecomm$PageValues
+product_related<-ecomm$ProductRelated
+cor(page_values,product_related)
+```
+
+
+
+```{r}
+#IMPLEMENTING THE SOLUTION 
+##K-MEANS CLUSTERING
+#Normalizing the required features
+normalize <- function(x){
+  return ((x-min(x)) / (max(x)-min(x)))
+}
+ecomm$ProductRelated<- normalize(ecomm$ProductRelated)
+ecomm$ProductRelated_Duration<- normalize(ecomm$ProductRelated_Duration)
+ecomm$PageValues<- normalize(ecomm$PageValues)
+head(ecomm)
+```
+
+
+```{r}
+####selecting necesarry columns
+ecomm1<-ecomm[c(1,2,3)]
+colnames(ecomm1)
+```
+
+```{r}
+# Applying the K-means clustering algorithm with number of centroids(k)=3
+result<- kmeans(ecomm1,3) 
+# Previewing the no. of records in each cluster
+result$size 
+```
+
+```{r}
+#value of cluster center datapoint
+result$centers
+```
+
+```{r}
+#cluster vector showing each record
+result$cluster
+```
+
+```{r}
+#clustering result visualization
+par(mfrow = c(1,2), mar = c(5,4,2,2))
+#plotting to see how product related duration and product related have been distributed
+plot(ecomm1[,1:2], col = result$cluster) 
+```
+
+```{r}
+#verifying the results of clustering
+par(mfrow = c(2,2), mar = c(5,4,2,2))
+#plotting product related duration and product related
+plot(ecomm1[c(1,2)], col = result$cluster)
+```
+
+```{r}
+#plotting page values and product related duration to check the distribution
+plot(ecomm1[c(2,3)], col = result$cluster)
+```
+```{r}
+ecomm1.class<- ecom[, "Revenue"]
+```
+
+```{r}
+plot(ecomm1[c(2,3)], col = ecomm1.class)
+```
+
+
+```{r}
+#HIERARCHICAL CLUSTERING
+#scaling the data
+ecomm1<-scale(ecomm1)
+head(ecomm1)
+```
+
+```{r}
+#computing the euclidean distance
+ec<-dist(ecomm1,method = "euclidean")
+#performing hierarchical clustering
+HC<-hclust(ec,method = "ward.D2")
+#plotting the dendrogram
+plot(HC,cex=0.6,hang= -1)
+```

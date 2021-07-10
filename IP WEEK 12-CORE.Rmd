@@ -1,0 +1,323 @@
+---
+output:
+  html_document: default
+  word_document: default
+editor_options: 
+  chunk_output_type: console
+  markdown: 
+    wrap: 72
+---
+
++-----------------------------------------------------------------------+
+| title: "IP WEEK 12" author: "EZRA MAGETO" date: "7/5/2021" output:    |
+| html_document                                                         |
++-----------------------------------------------------------------------+
+
+# Defining the question
+
+## Identifying which individuals are most likely to click on the cryptography course advert
+
+# Defining the metrics for success
+
+## Bi variate and Uni variate Exploratory data Analysis
+
+# Understanding the context
+
+## Target market for the cryptography course
+
+# Experimental Design
+
+```{r}
+#Importing the data
+df<-read.csv("http://bit.ly/IPAdvertisingData")
+head(df)
+```
+
+```{r}
+#previewing the dataset
+View(df)
+```
+
+```{r}
+#checking the column names
+colnames(df)
+```
+
+```{r}
+#previewing the head of the dataset
+head(df)
+```
+
+```{r}
+#previewing the tail of the dataset
+tail(df)
+```
+
+```{r}
+#structure of the data
+str(df)
+```
+
+```{r}
+#shape of the dataset
+dim(df)
+#the dataset has 1000 rows and 10 columns
+```
+
+# Data cleaning
+
+## Checking for Missing values
+
+```{r}
+sum(is.na(df))
+#there are no missing values in the dataset
+```
+
+# Duplicates
+
+```{r}
+#checking for duplicates
+sum(duplicated(df))
+#there are no duplicates in the dataset
+```
+
+```{r}
+#removal of incomplete objects in the dataset
+head(na.omit(df))
+```
+
+# Checking for outliers in area . income column
+
+```{r}
+#boxplots
+
+boxplot(df$Area.Income)
+```
+
+# Uni-variate Analysis
+
+## Measures of central Tendency
+
+```{r}
+summary(df)
+
+```
+
+# Finding the mode of age
+
+```{r}
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+df.Age.mode <- getmode(df$Age)
+df.Age.mode
+```
+
+```{r}
+#finding the median of age
+df.Age.median <- median(df$Age)
+df.Age.median 
+#[1] 35 is the median age
+```
+
+# Measures of dispersion
+
+### selecting the most important columns for calculating measures of dispersion-AGE and DAILY INTERNET USAGE
+
+### getting the minimum for internet usage
+
+```{r}
+df.Daily.Internet.Usage.min <- min(df$Daily.Internet.Usage)
+df.Daily.Internet.Usage.min
+#[1] 104.78
+```
+
+```{r}
+#finding the minimum for age
+df.Age.min <- min(df$Age)
+df.Age.min
+#[1] 19 is the min age
+```
+
+```{r}
+#Maximum
+df.Daily.Internet.Usage.max <- max(df$Daily.Internet.Usage)
+df.Daily.Internet.Usage.max
+#[1] 269.96 is the maximum internet usage
+```
+
+```{r}
+#maximum age
+df.Age.max <- max(df$Age)
+df.Age.max
+#[1] 61 is the maximum age
+```
+
+```{r}
+#range of internet usage
+df.Daily.Internet.Usage.range <- range(df$Daily.Internet.Usage)
+df.Daily.Internet.Usage.range
+#[1] 104.78 269.96 is the range of internet usage
+```
+
+```{r}
+#range of age
+df.Age.range <- range(df$Age)
+df.Age.range
+#[1] 19 61 is the range of age
+```
+
+```{r}
+# Finding the quantile of internet usage
+df.Daily.Internet.Usage.quantile <- quantile(df$Daily.Internet.Usage)
+df.Daily.Internet.Usage.quantile
+   #   0%      25%      50%      75%     100% 
+#104.7800 138.8300 183.1300 218.7925 269.9600 
+```
+
+```{r}
+#Quantile of age
+df.Age.quantile <- quantile(df$Age)
+df.Age.quantile
+# 0%  25%  50%  75% 100% 
+#  19   29   35   42   61
+```
+
+```{r}
+#variance of internet usage
+df.Daily.Internet.Usage.variance <- var(df$Daily.Internet.Usage)
+df.Daily.Internet.Usage.variance
+#[1] 1927.415 is the variance of internet usage
+```
+
+```{r}
+#variance of age
+df.Age.variance <- var(df$Age)
+df.Age.variance
+#[1] 77.18611 is the variance of age
+```
+
+```{r}
+#getting the standard deviation
+df.Daily.Internet.Usage.sd <- sd(df$Daily.Internet.Usage)
+df.Daily.Internet.Usage.sd
+#[1] 43.90234 is the standard deviation of internet usage
+```
+
+```{r}
+#standard deviation of age
+df.Age.sd <- sd(df$Age)
+df.Age.sd
+
+```
+
+# Uni-variate plots
+
+```{r}
+#getting outliers in the column Daily Time Spent on Site
+boxplot(df$Daily.Time.Spent.on.Site)
+```
+
+```{r}
+# getting  columns
+Daily.Internet.Usage <- df$Daily.Internet.Usage
+
+#  the frequency distribution
+Daily.Internet_Usage.frequency <- table(Daily.Internet.Usage)
+```
+
+```{r}
+
+# plotting the bargraph
+barplot(Daily.Internet.Usage)
+```
+
+```{r}
+#ploting bar plot on male column
+gender <- df$Male
+gender_freq <- table(gender)
+barplot(gender_freq,
+        col = "red")
+ #0 represented slightly more people compared to 1       
+```
+
+# histogram of daily internet usage
+
+```{r}
+hist(df$Daily.Internet.Usage)
+#there is a high frequency between 100 and 150 in daily internet usage
+```
+
+# histogram of age
+
+```{r}
+hist(df$Age)
+
+#majority of the people fall between 25-40 years
+```
+
+## Bi variate Analysis
+
+```{r}
+timespent <- df$Daily.Time.Spent.on.Site
+internetusage<- df$Daily.Internet.Usage
+
+# Using the cov() function to determine the covariance
+
+cov(timespent, internetusage)
+```
+
+```{r}
+# finding the correlation
+
+Age<-df$Age
+Daily.Internet.Usage<-df$Daily.Internet.Usage
+#using the cor function to find the correlation
+cor(Age, Daily.Internet.Usage)
+#There is a negative correlation between age and daily internet usage
+```
+
+# creating a scatter-plot
+
+```{r}
+timespent <- df$Daily.Time.Spent.on.Site
+internetusage<- df$Daily.Internet.Usage
+
+plot(timespent, internetusage, xlab="Daily time spent on site", ylab="Daily Internet Usage")
+```
+
+# SUPERVISED LEARNING
+
+\**\#\#Decision tree model*\#
+
+```{r}
+library(partykit)
+
+```
+
+```{r}
+# Creating the input data frame.
+input.dat <- df
+
+# Creating the tree.
+  output.tree <- ctree( Daily.Internet.Usage ~ Age + Clicked.on.Ad + 
+Daily.Time.Spent.on.Site, 
+  data = input.dat)
+```
+
+\#\#Plotting the tree
+
+```{r}
+plot(output.tree)
+```
+
+
+
+# CONCLUSION
+
+### It was realized that the higher the age, the lower the time that was spent on the site. There were no outliers in the data which made it easier for analysis The range in age of people who visited the site was between 19 an 61 years
+
+# Recommendation
+
+### More focus should be emphasized on the young people compared to the older people
