@@ -8,26 +8,50 @@ editor_options:
     wrap: 72
 ---
 
+# DEFINING THE QUESTION
 
-```
+### Kira Plastinina is a Russian brand that is sold through a defunct chain of retail stores in Russia, Ukraine, Kazakhstan, Belarus, China, Philippines, and Armenia. The brand's Sales and Marketing team would like to understand their customer's behavior from data that they have collected over the past year. More specifically, they would like to learn the characteristics of customer groups.
 
+------------------------------------------------------------------------
 
+# METRICS OF SUCCESS
 
+### 1.Perform clustering stating insights drawn from your analysis and visualizations.
 
+### 2.Upon implementation, provide comparisons between the approaches learned this week i.e. K-Means clustering vs Hierarchical clustering highlighting the strengths and limitations of each approach in the context of your analysis.
 
+# EXPERIMENTAL DESIGN 
 
+### You will create a Markdown which will comprise the following sections.
+
+------------------------------------------------------------------------
+
+#### 1.Problem Definition
+
+#### 2.Data Sourcing
+
+#### 3.Check the Data
+
+#### 4.Perform Data Cleaning
+
+#### 5.Perform Exploratory Data Analysis (Univariate, Bivariate & Multivariate)
+
+#### 6.Implement the Solution
+
+#### 7.Challenge the Solution
+
+#### 8.Follow up Questions
+
+# 1.0 READING THE DATASET
 
 ```{r}
 ecom<-read.csv("http://bit.ly/EcommerceCustomersDataset")
 ```
 
-
-
 ```{r}
 ##Previewing the top of the dataset
 head(ecom)
 ```
-
 
 ```{r}
 ##Previewing the bottom of the data
@@ -35,6 +59,7 @@ head(ecom)
 tail(ecom)
 ```
 
+# 1.1 EXPLORING THE DATASET
 
 ```{r}
 #EXPLORING THE DATASET
@@ -42,20 +67,18 @@ tail(ecom)
 View(ecom)
 ```
 
-
 ```{r}
 ##Checking the shape of the dataset
 dim(ecom)
 ```
 
-the dataset has 12330 rows and 18 columns 
+the dataset has 12330 rows and 18 columns
 
 ```{r}
-##Checking structure of the dataset
+##Checking information of the dataset
 
 str(ecom)
 ```
-
 
 ```{r}
 ##checking the column names of the dataset
@@ -63,21 +86,19 @@ str(ecom)
 colnames(ecom)
 ```
 
-
 ```{r}
 ##Checking the datatypes of the dataset
 class(ecom)
 sapply(ecom,class)
 ```
 
-
-
 ```{r}
 ##Important features
-ecomm<-subset(ecom,select = c("ProductRelated", "ProductRelated_Duration", "PageValues", "Month", "VisitorType", "Weekend"))
-colnames(ecomm)
+ecomm <- ecom[, c(1,2,3,4,5,6,7,8,9,10)]
+names(ecomm)
 ```
 
+# 2.0 CLEANING THE DATASET
 
 ```{r}
 #DATA CLEANING 
@@ -86,42 +107,45 @@ colnames(ecomm)
 sum(is.na(ecomm))
 ```
 
-
-
 ```{r}
 ##Dealing with missing values
 ecomm<-na.omit(ecomm)
 sum(is.na(ecomm))
 ```
 
-
-
 ```{r}
 ##Checking for duplicates
 sum(duplicated(ecomm))
 ```
 
-
-
 ```{r}
 ##Dealing with duplicates
+###To deal with duplicates i pick the non duplicated data
+ecomm = ecomm[!duplicated(ecomm), ]
+dim(ecomm)
 
-unique(ecomm)
 
 ```
-
-
 
 ```{r}
 ##Checking for outliers
 product_related<-ecomm$ProductRelated
 product_related_duration<-ecomm$ProductRelated_Duration
 page_values<-ecomm$PageValues
-boxplot(product_related,product_related_duration,page_values)
+Administrative<-ecomm$Administrative
+Administrative_Duration<-ecomm$Administrative_Duration
+Informational<-ecomm$Informational
+Informational_Duration<-ecomm$Informational_Duration
+BounceRates<-ecomm$BounceRates
+ExitRates<-ecomm$ExitRates
+SpecialDay<-ecomm$SpecialDay
+boxplot(product_related,product_related_duration,page_values,SpecialDay,ExitRates,BounceRates,Informational_Duration,Informational,Administrative_Duration,Administrative)
 ```
 
 the dataset contains some outliers in the Product Related Duration
-feature 
+feature
+
+# 2.1 EXPLORATORY DATA ANALYSI
 
 ```{r}
 #EXPLORATORY DATA ANALYSIS
@@ -133,44 +157,79 @@ summary(ecom)
 From the descriptive statistics weekdays had the most numbers visiting
 the site Many people who visited the site did not generate any revenue
 for the brand. Only 1908 out of 12330 contributed to revenue addition
-for the brand. \#\#Barplot
+for the brand.
 
 ```{r}
-ProductRelated <- ecomm$ProductRelated
-ProductRelated_frequency <- table(ProductRelated)
-barplot(ProductRelated_frequency)
+#Plotting Histogram of selected features
+library(DataExplorer)
+plot_histogram(ecomm)
 ```
 
-there is a positive skew in the distribution \#\#Histogram
+there is a positive skew in the distribution Of the features
 
 ```{r}
-hist(ecomm$ProductRelated)
+#creating bar plots for all categorical column
+month_table <- table(ecom$Month)
+os_table <- table(ecom$OperatingSystems)
+browser_table <- table(ecom$Browser)
+region_table <- table(ecom$Region)
+traffic_table <- table(ecom$TrafficType)
+visitor_table <- table(ecom$VisitorType)
+weekend_table <- table(ecom$Weekend)
+revenue_table <- table(ecom$Revenue)
 ```
-
 
 ```{r}
-###Product related duration histogram
-hist(ecomm$ProductRelated_Duration)
+#creating barplot for month
+barplot(month_table)
+##the month of May had the most visits to the site while February was the least visited
 ```
-
-
 
 ```{r}
-###Page values histogram
-hist(ecomm$PageValues)
+#Barplot indicating visitor type
+barplot(visitor_table)
 ```
 
+returning visitors form the majority of of the visitor type
+
+```{r}
+#weekend barplot
+barplot(weekend_table)
+```
+
+the site is mostly visited during the weekdays
+
+```{r}
+#revenue barplot
+barplot(revenue_table)
+```
+
+individuals who visit the site and generate revenue are less.Majority of
+the people visit the site and don't generate any revenue
+
+```{r}
+#barplot on traffictype
+barplot(traffic_table)
+```
+
+type 2 traffic is the highest followed by type 1 traffic
+
+```{r}
+#bar on region
+barplot(region_table)
+```
+
+Region 1 has the majority of people who visit the site while region 9 is
+the lowest
 
 ```{r}
 #Bivariate Analysis 
 ##getting the covariance
 page_values<-ecomm$PageValues
 product_related<-ecomm$ProductRelated
-#product_related_duration<-ecomm$ProductRelated_Duration
+
 cov(page_values,product_related)
 ```
-
-
 
 ```{r}
 ##correlation
@@ -179,29 +238,64 @@ product_related<-ecomm$ProductRelated
 cor(page_values,product_related)
 ```
 
+```{r}
+#correlation plot
+library(ggcorrplot)
+library(dplyr)
+corr = round(cor(select_if(ecomm, is.numeric)), 4)
+ggcorrplot(corr, hc.order = T, ggtheme = ggplot2::theme_grey,
+   colors = c("cyan", "peachpuff4", "pink"), lab = T)
 
+```
+
+there is a high correlation between the bounce rate and the exit rate
 
 ```{r}
-#IMPLEMENTING THE SOLUTION 
-##K-MEANS CLUSTERING
-#Normalizing the required features
+##plotting revenue per month
+
+rev_month <- table(ecom$Revenue, ecom$Month)
+barplot(rev_month, main = "Revenue per Month", col = c("black", "cyan"), beside = TRUE, 
+        legend = rownames(rev_month), xlab = "Month")
+```
+
+November returned the highest number of revenue
+
+```{r}
+##plotting revenue per region
+
+rev_region <- table(ecom$Revenue, ecom$Region)
+barplot(rev_region, main = "Revenue per Region", col = c("black", "cyan"), beside = TRUE, 
+        legend = rownames(rev_region), xlab = "Region")
+```
+
+region 1 returned more revenue with region 5 being the least
+
+# 3.0 IMPLEMENTING THE SOLUTION
+
+## K-MEANS CLUSTERING
+
+#### Normalizing the required features
+
+```{r}
 normalize <- function(x){
   return ((x-min(x)) / (max(x)-min(x)))
 }
 ecomm$ProductRelated<- normalize(ecomm$ProductRelated)
 ecomm$ProductRelated_Duration<- normalize(ecomm$ProductRelated_Duration)
 ecomm$PageValues<- normalize(ecomm$PageValues)
+
 head(ecomm)
 ```
 
-
 ```{r}
 ####selecting necesarry columns
-ecomm1<-ecomm[c(1,2,3)]
+ecomm1<-ecomm[c(5,6,9)]
 colnames(ecomm1)
 ```
 
 ```{r}
+#
+
 # Applying the K-means clustering algorithm with number of centroids(k)=3
 result<- kmeans(ecomm1,3) 
 # Previewing the no. of records in each cluster
@@ -236,14 +330,15 @@ plot(ecomm1[c(1,2)], col = result$cluster)
 #plotting page values and product related duration to check the distribution
 plot(ecomm1[c(2,3)], col = result$cluster)
 ```
+
 ```{r}
+#implementing with class attribute 'revenue'
 ecomm1.class<- ecom[, "Revenue"]
 ```
 
 ```{r}
 plot(ecomm1[c(2,3)], col = ecomm1.class)
 ```
-
 
 ```{r}
 #HIERARCHICAL CLUSTERING
@@ -260,3 +355,15 @@ HC<-hclust(ec,method = "ward.D2")
 #plotting the dendrogram
 plot(HC,cex=0.6,hang= -1)
 ```
+
+# 4.0 CONCLUSION
+
+### Majority of the people visit the site during the weekdays
+
+### Majority of people visit the site but don't generate revenue
+
+### Most of the returning visitors generate revenue to the brand,this is a good indication to have loyal customers
+
+# 5.0 RECOMMENDATION
+
+### Provide incentives to returning visitors to attract more new visitors

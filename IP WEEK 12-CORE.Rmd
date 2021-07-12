@@ -13,19 +13,29 @@ editor_options:
 | html_document                                                         |
 +-----------------------------------------------------------------------+
 
-# Defining the question
+# 1) Defining the question
 
 ## Identifying which individuals are most likely to click on the cryptography course advert
 
-# Defining the metrics for success
+# 2) Defining the metrics for success
 
 ## Bi variate and Uni variate Exploratory data Analysis
 
-# Understanding the context
+# 3) Understanding the context
 
-## Target market for the cryptography course
+## A Kenyan entrepreneur has created an online cryptography course and would want to advertise it on her blog. She currently targets audiences originating from various countries. In the past, she ran ads to advertise a related course on the same blog and collected data in the process. She would now like to employ your services as a Data Science Consultant to help her identify which individuals are most likely to click on her ads.
 
-# Experimental Design
+# 4) Experimental Design 
+
+### 1)Define the question, the metric for success, the context, experimental design taken and the appropriateness of the available data to answer the given question.
+
+### 2)Find and deal with outliers, anomalies, and missing data within the dataset.
+
+### 3)Perform univariate and bivariate analysis. 
+
+### 4)From your insights provide a conclusion and recommendation.
+
+# 5)Reading the data
 
 ```{r}
 #Importing the data
@@ -64,7 +74,7 @@ dim(df)
 #the dataset has 1000 rows and 10 columns
 ```
 
-# Data cleaning
+\#5.0 Data cleaning
 
 ## Checking for Missing values
 
@@ -73,7 +83,7 @@ sum(is.na(df))
 #there are no missing values in the dataset
 ```
 
-# Duplicates
+## Duplicates
 
 ```{r}
 #checking for duplicates
@@ -86,155 +96,79 @@ sum(duplicated(df))
 head(na.omit(df))
 ```
 
-# Checking for outliers in area . income column
+## Checking for outliers in the various columns
 
 ```{r}
-#boxplots
+#selecting the columns
+daily_time_spent<-df$Daily.Time.Spent.on.Site
+daily_internet_uage<-df$Daily.Internet.Usage
+male<-df$Male
+clicked_on_ad<-df$Clicked.on.Ad
+age<-df$Age
+area_income<-df$Area.Income
 
-boxplot(df$Area.Income)
+
 ```
 
-# Uni-variate Analysis
+## creating the boxplots
 
-## Measures of central Tendency
+```{r}
+boxplot(daily_time_spent)
+```
+
+```{r}
+boxplot(daily_internet_uage)
+```
+
+```{r}
+boxplot(male)
+```
+
+```{r}
+boxplot(clicked_on_ad)
+```
+
+```{r}
+boxplot(age)
+```
+
+```{r}
+boxplot(area_income)
+```
+
+presence of outliers is absent in most of the boxplot features apart
+from area income which is evident because people earn different amounts
+of income
+
+\#5.1 Uni-variate Analysis \#\# Measures of dispersion \#\#\# getting
+the summary statistics of each column
 
 ```{r}
 summary(df)
-
+#the average daily internet usage is 180
+#the average age of people on the site is 36 years
 ```
 
-# Finding the mode of age
+## Uni-variate plots
 
 ```{r}
-getmode <- function(v) {
-   uniqv <- unique(v)
-   uniqv[which.max(tabulate(match(v, uniqv)))]
-}
-df.Age.mode <- getmode(df$Age)
-df.Age.mode
-```
-
-```{r}
-#finding the median of age
-df.Age.median <- median(df$Age)
-df.Age.median 
-#[1] 35 is the median age
-```
-
-# Measures of dispersion
-
-### selecting the most important columns for calculating measures of dispersion-AGE and DAILY INTERNET USAGE
-
-### getting the minimum for internet usage
-
-```{r}
-df.Daily.Internet.Usage.min <- min(df$Daily.Internet.Usage)
-df.Daily.Internet.Usage.min
-#[1] 104.78
+#histogram on daily time spent
+daily_time_spent <- df$Daily.Time.Spent.on.Site
+daily_time_spent_frequency <- table(daily_time_spent)
+hist(daily_time_spent,
+        col = "black")
+#the minimum time spent is 32 while the average is 65
 ```
 
 ```{r}
-#finding the minimum for age
-df.Age.min <- min(df$Age)
-df.Age.min
-#[1] 19 is the min age
+age<-df$Age
+hist(age,col = "green")
+#age 60 had less frequency on the site while age 35 had more frequency on the site
 ```
 
 ```{r}
-#Maximum
-df.Daily.Internet.Usage.max <- max(df$Daily.Internet.Usage)
-df.Daily.Internet.Usage.max
-#[1] 269.96 is the maximum internet usage
-```
+#plotting bar plot on male column
 
-```{r}
-#maximum age
-df.Age.max <- max(df$Age)
-df.Age.max
-#[1] 61 is the maximum age
-```
-
-```{r}
-#range of internet usage
-df.Daily.Internet.Usage.range <- range(df$Daily.Internet.Usage)
-df.Daily.Internet.Usage.range
-#[1] 104.78 269.96 is the range of internet usage
-```
-
-```{r}
-#range of age
-df.Age.range <- range(df$Age)
-df.Age.range
-#[1] 19 61 is the range of age
-```
-
-```{r}
-# Finding the quantile of internet usage
-df.Daily.Internet.Usage.quantile <- quantile(df$Daily.Internet.Usage)
-df.Daily.Internet.Usage.quantile
-   #   0%      25%      50%      75%     100% 
-#104.7800 138.8300 183.1300 218.7925 269.9600 
-```
-
-```{r}
-#Quantile of age
-df.Age.quantile <- quantile(df$Age)
-df.Age.quantile
-# 0%  25%  50%  75% 100% 
-#  19   29   35   42   61
-```
-
-```{r}
-#variance of internet usage
-df.Daily.Internet.Usage.variance <- var(df$Daily.Internet.Usage)
-df.Daily.Internet.Usage.variance
-#[1] 1927.415 is the variance of internet usage
-```
-
-```{r}
-#variance of age
-df.Age.variance <- var(df$Age)
-df.Age.variance
-#[1] 77.18611 is the variance of age
-```
-
-```{r}
-#getting the standard deviation
-df.Daily.Internet.Usage.sd <- sd(df$Daily.Internet.Usage)
-df.Daily.Internet.Usage.sd
-#[1] 43.90234 is the standard deviation of internet usage
-```
-
-```{r}
-#standard deviation of age
-df.Age.sd <- sd(df$Age)
-df.Age.sd
-
-```
-
-# Uni-variate plots
-
-```{r}
-#getting outliers in the column Daily Time Spent on Site
-boxplot(df$Daily.Time.Spent.on.Site)
-```
-
-```{r}
-# getting  columns
-Daily.Internet.Usage <- df$Daily.Internet.Usage
-
-#  the frequency distribution
-Daily.Internet_Usage.frequency <- table(Daily.Internet.Usage)
-```
-
-```{r}
-
-# plotting the bargraph
-barplot(Daily.Internet.Usage)
-```
-
-```{r}
-#ploting bar plot on male column
 gender <- df$Male
 gender_freq <- table(gender)
 barplot(gender_freq,
@@ -242,19 +176,10 @@ barplot(gender_freq,
  #0 represented slightly more people compared to 1       
 ```
 
-# histogram of daily internet usage
-
 ```{r}
-hist(df$Daily.Internet.Usage)
-#there is a high frequency between 100 and 150 in daily internet usage
-```
-
-# histogram of age
-
-```{r}
-hist(df$Age)
-
-#majority of the people fall between 25-40 years
+#histogram of selected features
+library(DataExplorer)
+plot_histogram(df)
 ```
 
 ## Bi variate Analysis
@@ -268,6 +193,9 @@ internetusage<- df$Daily.Internet.Usage
 cov(timespent, internetusage)
 ```
 
+there is a high covariance between time spent and daily internet usage
+indicating a positive relation between the two variables
+
 ```{r}
 # finding the correlation
 
@@ -278,7 +206,18 @@ cor(Age, Daily.Internet.Usage)
 #There is a negative correlation between age and daily internet usage
 ```
 
-# creating a scatter-plot
+## creating a correlation plot
+
+```{r}
+library(ggcorrplot)
+library(dplyr)
+corr = round(cor(select_if(df, is.numeric)), 4)
+ggcorrplot(corr, hc.order = T, ggtheme = ggplot2::theme_grey,
+   colors = c("cyan", "peachpuff4", "pink"), lab = T)
+
+```
+
+## creating a scatter-plot
 
 ```{r}
 timespent <- df$Daily.Time.Spent.on.Site
@@ -289,7 +228,7 @@ plot(timespent, internetusage, xlab="Daily time spent on site", ylab="Daily Inte
 
 # SUPERVISED LEARNING
 
-\**\#\#Decision tree model*\#
+## Decision tree model
 
 ```{r}
 library(partykit)
@@ -312,11 +251,13 @@ Daily.Time.Spent.on.Site,
 plot(output.tree)
 ```
 
-
-
 # CONCLUSION
 
-### It was realized that the higher the age, the lower the time that was spent on the site. There were no outliers in the data which made it easier for analysis The range in age of people who visited the site was between 19 an 61 years
+### It was realized that the higher the age, the lower the time spent on the site.
+
+### People with high income levels visited the site more 
+
+### The average age of visiting the ad site is 36years
 
 # Recommendation
 
